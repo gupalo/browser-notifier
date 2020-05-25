@@ -1,5 +1,5 @@
 services:
-    Gupalo\BrowserNotifier:
+    Gupalo\BrowserNotifier\BrowserNotifier:
         autowire: true
 
     Gupalo\BrowserNotifier\Twig\:
