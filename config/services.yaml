@@ -1,3 +1,7 @@
 services:
     Gupalo\BrowserNotifier:
         autowire: true
+
+    Gupalo\BrowserNotifier\Twig\:
+        resource: '../vendor/gupalo/browser-notifier/src/Twig'
+        tags: ['twig.extension']
