@@ -3,11 +3,16 @@
 namespace Gupalo\BrowserNotifier;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 
 class BrowserLogger implements LoggerInterface
 {
+    use LoggerTrait;
+
     private BrowserNotifier $notifier;
+
+    private bool $isDirty = false;
 
     private const LEVEL_DEBUG = 100;
     private const LEVEL_INFO = 200;
@@ -40,96 +45,60 @@ class BrowserLogger implements LoggerInterface
     {
         $this->notifier = $notifier;
 
-        if (is_int($level) || preg_match('#^\d+$#', $level)) {
-            $this->level = (int)$level;
-        } else {
-            $this->level = self::LEVELS[$level] ?? self::LEVELS[LogLevel::INFO];
-        }
+        $this->level = $this->intLevel($level);
     }
 
-    public function emergency($message, array $context = []): void
-    {
-        if (self::LEVEL_EMERGENCY >= $this->level) {
-            $this->notifier->error($message);
-        }
-    }
-
-    public function alert($message, array $context = []): void
-    {
-        if (self::LEVEL_ALERT >= $this->level) {
-            $this->notifier->error($message);
-        }
-    }
-
-    public function critical($message, array $context = []): void
-    {
-        if (self::LEVEL_CRITICAL >= $this->level) {
-            $this->notifier->error($message);
-        }
-    }
-
-    public function error($message, array $context = []): void
-    {
-        if (self::LEVEL_ERROR >= $this->level) {
-            $this->notifier->error($message);
-        }
-    }
-
-    public function warning($message, array $context = []): void
-    {
-        if (self::LEVEL_WARNING >= $this->level) {
-            $this->notifier->warning($message);
-        }
-    }
-
-    public function notice($message, array $context = []): void
-    {
-        if (self::LEVEL_NOTICE >= $this->level) {
-            $this->notifier->warning($message);
-        }
-    }
-
-    public function info($message, array $context = []): void
-    {
-        if (self::LEVEL_INFO >= $this->level) {
-            $this->notifier->send($message);
-        }
-    }
-
-    public function debug($message, array $context = []): void
-    {
-        if (self::LEVEL_DEBUG >= $this->level) {
-            $this->notifier->send($message);
-        }
-    }
-
+    /**
+     * @param int|string $level
+     * @param string $message
+     * @param array $context
+     */
     public function log($level, $message, array $context = []): void
     {
-        switch ($level) {
-            case LogLevel::EMERGENCY:
-                $this->emergency($message);
-                break;
-            case LogLevel::ALERT:
-                $this->alert($message);
-                break;
-            case LogLevel::CRITICAL:
-                $this->critical($message);
-                break;
-            case LogLevel::ERROR:
-                $this->error($message);
-                break;
-            case LogLevel::WARNING:
-                $this->warning($message);
-                break;
-            case LogLevel::NOTICE:
-                $this->notice($message);
-                break;
-            case LogLevel::INFO:
-                $this->info($message);
-                break;
-            default:
-                $this->debug($message);
-                break;
+        $intLevel = $this->intLevel($level);
+        if ($intLevel >= $this->level) {
+            $this->isDirty = true;
+
+            switch ($this->intLevel($level)) {
+                case self::LEVEL_EMERGENCY:
+                case self::LEVEL_ALERT:
+                case self::LEVEL_CRITICAL:
+                case self::LEVEL_ERROR:
+                    $this->notifier->error($message);
+                    break;
+                case self::LEVEL_WARNING:
+                case self::LEVEL_NOTICE:
+                    $this->notifier->warning($message);
+                    break;
+                default:
+                    $this->notifier->send($message);
+                    break;
+            }
         }
+    }
+
+    public function isDirty(): bool
+    {
+        return $this->isDirty;
+    }
+
+    public function clear(): void
+    {
+        $this->isDirty = false;
+    }
+
+    /**
+     * @param int|string $level
+     * @return int
+     */
+    private function intLevel($level): int
+    {
+        if (is_int($level) || preg_match('#^\d+$#', $level)) {
+            $result = (int)$level;
+        } else {
+            $result = self::LEVELS[$level] ?? self::LEVELS[LogLevel::INFO];
+        }
+
+        return $result;
     }
 }

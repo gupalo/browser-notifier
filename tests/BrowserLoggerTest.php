@@ -144,4 +144,19 @@ class BrowserLoggerTest extends TestCase
 
         $this->notifier->send('test')->shouldBeCalledOnce();
     }
+
+    public function testIsDirty(): void
+    {
+        $this->assertFalse($this->logger->isDirty());
+
+        $this->logger->log(LogLevel::DEBUG, 'test', ['context' => 'is_skipped']);
+
+        $this->notifier->send('test')->shouldBeCalledOnce();
+
+        $this->assertTrue($this->logger->isDirty());
+
+        $this->logger->clear();
+
+        $this->assertFalse($this->logger->isDirty());
+    }
 }
