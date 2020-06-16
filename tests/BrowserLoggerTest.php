@@ -145,18 +145,25 @@ class BrowserLoggerTest extends TestCase
         $this->notifier->send('test')->shouldBeCalledOnce();
     }
 
-    public function testIsDirty(): void
+    public function testGetMaxLevel(): void
     {
-        $this->assertFalse($this->logger->isDirty());
+        $this->assertSame(0, $this->logger->getMaxLevel());
 
         $this->logger->log(LogLevel::DEBUG, 'test', ['context' => 'is_skipped']);
 
         $this->notifier->send('test')->shouldBeCalledOnce();
 
-        $this->assertTrue($this->logger->isDirty());
+        $this->assertSame(BrowserLogger::DEBUG, $this->logger->getMaxLevel());
+    }
 
-        $this->logger->clear();
+    public function testSetMaxLevel(): void
+    {
+        $this->assertSame(0, $this->logger->getMaxLevel());
 
-        $this->assertFalse($this->logger->isDirty());
+        $this->logger->setMaxLevel(BrowserLogger::NOTICE);
+        $this->assertSame(BrowserLogger::NOTICE, $this->logger->getMaxLevel());
+
+        $this->logger->setMaxLevel(LogLevel::WARNING);
+        $this->assertSame(BrowserLogger::WARNING, $this->logger->getMaxLevel());
     }
 }
