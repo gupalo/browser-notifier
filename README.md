@@ -33,3 +33,5 @@ Controller
 Twig
 
     {{ app.request.hasPreviousSession ? app.flashes('notification')|browser_notifications|raw : '' }}
+
+Use `BrowserLogger` as logger implementing `LoggerInterface`.

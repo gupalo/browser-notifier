@@ -1,4 +1,6 @@
 services:
+    Gupalo\BrowserNotifier\BrowserLogger:
+        autowire: true
     Gupalo\BrowserNotifier\BrowserNotifier:
         autowire: true
 
