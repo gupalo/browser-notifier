@@ -17,7 +17,7 @@ class BrowserNotifier
     /**
      * @param string|string[] $s
      */
-    public function send($s): void
+    public function send(array|string $s): void
     {
         $this->doSend($s);
     }
@@ -25,7 +25,7 @@ class BrowserNotifier
     /**
      * @param string|string[] $s
      */
-    public function success($s): void
+    public function success(array|string $s): void
     {
         $this->doSend($s, '[success]');
     }
@@ -33,7 +33,7 @@ class BrowserNotifier
     /**
      * @param string|string[] $s
      */
-    public function warning($s): void
+    public function warning(array|string $s): void
     {
         $this->doSend($s, '[warning]');
     }
@@ -47,10 +47,10 @@ class BrowserNotifier
     }
 
     /**
-     * @param string|array $s
+     * @param array|string $s
      * @param string|null $emoji
      */
-    private function doSend($s, string $emoji = null): void
+    private function doSend(array|string $s, ?string $emoji = null): void
     {
         if (is_array($s)) {
             foreach ($s as $item) {

@@ -37,23 +37,15 @@ class BrowserLogger implements LoggerInterface
 
     private int $level;
 
-    /**
-     * @param BrowserNotifier $notifier
-     * @param string|int $level
-     */
-    public function __construct(BrowserNotifier $notifier, $level = self::INFO)
+    public function __construct(BrowserNotifier $notifier, int|string $level = self::INFO)
     {
         $this->notifier = $notifier;
 
         $this->level = $this->intLevel($level);
     }
 
-    /**
-     * @param int|string $level
-     * @param string $message
-     * @param array $context
-     */
-    public function log($level, $message, array $context = []): void
+    /** @param int|string $level */
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $intLevel = $this->intLevel($level);
         if ($intLevel >= $this->level) {
@@ -97,7 +89,7 @@ class BrowserLogger implements LoggerInterface
      * @param int|string $level
      * @return int
      */
-    private function intLevel($level): int
+    private function intLevel(int|string $level): int
     {
         if (is_int($level) || preg_match('#^\d+$#', $level)) {
             $result = (int)$level;
