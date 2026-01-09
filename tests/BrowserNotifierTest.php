@@ -1,94 +1,84 @@
-<?php /** @noinspection PhpUndefinedMethodInspection *//** @noinspection PhpParamsInspection */
+<?php
 
 namespace Gupalo\BrowserNotifier\Tests;
 
 use Gupalo\BrowserNotifier\BrowserNotifier;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 
 class BrowserNotifierTest extends TestCase
 {
-    use ProphecyTrait;
-
-    /** @var NotifierInterface */
-    private $notifier;
+    private MockObject&NotifierInterface $notifier;
 
     private BrowserNotifier $browserNotifier;
 
     protected function setUp(): void
     {
-        $this->notifier = $this->prophesize(NotifierInterface::class);
-
-        $this->browserNotifier = new BrowserNotifier($this->notifier->reveal());
+        $this->notifier = $this->createMock(NotifierInterface::class);
+        $this->browserNotifier = new BrowserNotifier($this->notifier);
     }
 
     public function testSend(): void
     {
-        $this->notifier->send(Argument::that(function($v){
-            /** @var Notification $v */
-            $this->assertInstanceOf(Notification::class, $v);
-            $this->assertSame('test', $v->getSubject());
-
-            return true;
-        }))->shouldBeCalledOnce();
+        $this->notifier->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Notification $notification): bool {
+                $this->assertSame('test', $notification->getSubject());
+                return true;
+            }));
 
         $this->browserNotifier->send('test');
     }
 
     public function testSend_Multiple(): void
     {
-        $this->notifier->send(Argument::that(function($v){
-            /** @var Notification $v */
-            $this->assertInstanceOf(Notification::class, $v);
-            $this->assertSame('test', $v->getSubject());
-
-            return true;
-        }))->shouldBeCalledTimes(3);
+        $this->notifier->expects($this->exactly(3))
+            ->method('send')
+            ->with($this->callback(function (Notification $notification): bool {
+                $this->assertSame('test', $notification->getSubject());
+                return true;
+            }));
 
         $this->browserNotifier->send(['test', 'test', 'test']);
     }
 
     public function testSuccess(): void
     {
-        $this->notifier->send(Argument::that(function($v){
-            /** @var Notification $v */
-            $this->assertInstanceOf(Notification::class, $v);
-            $this->assertSame('test', $v->getSubject());
-            $this->assertSame('[success]', $v->getEmoji());
-
-            return true;
-        }))->shouldBeCalledOnce();
+        $this->notifier->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Notification $notification): bool {
+                $this->assertSame('test', $notification->getSubject());
+                $this->assertSame('[success]', $notification->getEmoji());
+                return true;
+            }));
 
         $this->browserNotifier->success('test');
     }
 
     public function testWarning(): void
     {
-        $this->notifier->send(Argument::that(function($v){
-            /** @var Notification $v */
-            $this->assertInstanceOf(Notification::class, $v);
-            $this->assertSame('test', $v->getSubject());
-            $this->assertSame('[warning]', $v->getEmoji());
-
-            return true;
-        }))->shouldBeCalledOnce();
+        $this->notifier->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Notification $notification): bool {
+                $this->assertSame('test', $notification->getSubject());
+                $this->assertSame('[warning]', $notification->getEmoji());
+                return true;
+            }));
 
         $this->browserNotifier->warning('test');
     }
 
     public function testError(): void
     {
-        $this->notifier->send(Argument::that(function($v){
-            /** @var Notification $v */
-            $this->assertInstanceOf(Notification::class, $v);
-            $this->assertSame('test', $v->getSubject());
-            $this->assertSame('[error]', $v->getEmoji());
-
-            return true;
-        }))->shouldBeCalledOnce();
+        $this->notifier->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Notification $notification): bool {
+                $this->assertSame('test', $notification->getSubject());
+                $this->assertSame('[error]', $notification->getEmoji());
+                return true;
+            }));
 
         $this->browserNotifier->error('test');
     }

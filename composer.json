@@ -6,20 +6,21 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "psr/log": ">=1.1",
-        "symfony/notifier": "^6.4|^7.0",
-        "twig/twig": "^3.3"
+        "php": ">=8.4",
+        "psr/log": ">=3.0",
+        "symfony/notifier": "^7.4|^8.0",
+        "twig/twig": "^3.22"
     },
     "require-dev": {
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^10.5"
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5"
     },
     "config": {
         "preferred-install": {
             "*": "dist"
         },
         "platform": {
-            "php": "8.1"
+            "php": "8.4"
         },
         "sort-packages": true
     },
